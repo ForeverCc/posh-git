@@ -11,10 +11,6 @@
       Write-Host "Could not remove `'$poshgitPath`'"
     }
 
-    $poshGitInstall = if ($env:poshGit ) { $env:poshGit } else { 'https://github.com/dahlbyk/posh-git/zipball/master' }
-    Install-ChocolateyZipPackage 'poshgit' $poshGitInstall $poshgitPath
-    $currentVersionPath = Get-ChildItem "$poshgitPath\*posh-git*\" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-
     if(Test-Path $PROFILE) {
         $oldProfile = @(Get-Content $PROFILE)
 
@@ -24,9 +20,10 @@
         $newProfile = @()
         foreach($line in $oldProfile) {
             if ($line -like '*PoshGitPrompt*') { continue; }
+            if ($line -like '*Load posh-git example profile*') { continue; }
 
             if($line -like '. *posh-git*profile.example.ps1*') {
-                $line = ". '$currentVersionPath\profile.example.ps1'"
+                continue;
             }
             $newProfile += $line
         }
