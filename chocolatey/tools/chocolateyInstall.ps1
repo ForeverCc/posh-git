@@ -13,18 +13,16 @@
 
     $poshGitInstall = if ($env:poshGit ) { $env:poshGit } else { 'https://github.com/dahlbyk/posh-git/zipball/master' }
     Install-ChocolateyZipPackage 'poshgit' $poshGitInstall $poshgitPath
-    $pgitDir = Dir "$poshgitPath\*posh-git*\" | Sort-Object -Property LastWriteTime | Select -Last 1
+    $currentVersionPath = Get-ChildItem "$poshgitPath\*posh-git*\" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
 
     if(Test-Path $PROFILE) {
         $oldProfile = @(Get-Content $PROFILE)
         $newProfile = @()
-        #If old profile exists replace with new one and make sure prompt preservation function is on top
-        $pgitExample = "$pgitDir\profile.example.ps1"
         foreach($line in $oldProfile) {
             if ($line -like '*PoshGitPrompt*') { continue; }
 
-            if($line.ToLower().Contains("$poshgitPath".ToLower())) {
-                $line = ". '$pgitExample'"
+            if($line -like '. *posh-git*profile.example.ps1*') {
+                $line = ". '$currentVersionPath\profile.example.ps1'"
             }
             $newProfile += $line
         }
