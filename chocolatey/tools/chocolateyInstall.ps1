@@ -17,6 +17,10 @@
 
     if(Test-Path $PROFILE) {
         $oldProfile = @(Get-Content $PROFILE)
+
+        . $currentVersionPath\src\Util.ps1
+        $oldProfileEncoding = Get-FileEncoding $PROFILE
+
         $newProfile = @()
         foreach($line in $oldProfile) {
             if ($line -like '*PoshGitPrompt*') { continue; }
@@ -26,11 +30,11 @@
             }
             $newProfile += $line
         }
-        Set-Content -path $profile -value $newProfile -Force
+        Set-Content -path $profile -value $newProfile -Force -Encoding $oldProfileEncoding
     }
 } catch {
   try {
-    if($oldProfile){ Set-Content -path $PROFILE -value $oldProfile -Force }
+    if($oldProfile){ Set-Content -path $PROFILE -value $oldProfile -Force -Encoding $oldProfileEncoding }
   }
   catch {}
   throw
